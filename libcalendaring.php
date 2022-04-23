@@ -195,7 +195,10 @@ class libcalendaring extends rcube_plugin
             $dt = rcube_utils::anytodatetime($dt);
         }
 
-        if (($dt instanceof DateTime || $dt instanceof DateTimeImmutable) && empty($dt->_dateonly) && !$dateonly) {
+	if (($dt instanceof DateTime || $dt instanceof DateTimeImmutable) && empty($dt->_dateonly) && !$dateonly) {
+	    if ($dt instanceof DateTimeImmutable) {
+                $dt = DateTime::createFromImmutable( $dt );
+            }
             $dt->setTimezone($this->timezone);
         }
 
@@ -506,6 +509,9 @@ class libcalendaring extends rcube_plugin
     {
         return array_map(function($alarm){
             if ($alarm['trigger'] instanceof DateTime || $alarm['trigger'] instanceof DateTimeImmutable) {
+                if ($alarm['trigger'] instanceof DateTimeImmutable) {
+                    $alarm['trigger'] = DateTime::createFromImmutable( $alarm['trigger'] );
+                }
                 $alarm['trigger'] = '@' . $alarm['trigger']->format('U');
             }
             else if ($trigger = libcalendaring::parse_alarm_value($alarm['trigger'])) {
@@ -584,6 +590,9 @@ class libcalendaring extends rcube_plugin
         }
 
         if ($trigger instanceof DateTime || $trigger instanceof DateTimeImmutable) {
+            if ($trigger instanceof DateTimeImmutable) {
+                $trigger = DateTime::createFromImmutable( $trigger );
+            }
             $text .= ' ' . $rcube->gettext(array(
                 'name' => 'libcalendaring.alarmat',
                 'vars' => array('datetime' => $rcube->format_date($trigger))
@@ -664,6 +673,9 @@ class libcalendaring extends rcube_plugin
             $notify_time = null;
 
             if ($alarm['trigger'] instanceof DateTime || $alarm['trigger'] instanceof DateTimeImmutable) {
+                if ($alarm['trigger'] instanceof DateTimeImmutable) {
+                    $alarm['trigger'] = DateTime::createFromImmutable( $alarm['trigger'] );
+                }
                 $notify_time = $alarm['trigger'];
             }
             else if (is_string($alarm['trigger'])) {
@@ -1099,6 +1111,9 @@ class libcalendaring extends rcube_plugin
                 try {
                     $dt = new DateTime($rdate, $tz);
                     if (is_a($start, 'DateTime') || is_a($start, 'DateTimeImmutable'))
+                        if ($start instanceof DateTimeImmutable) {
+                            $start = DateTime::createFromImmutable( $start );
+                        }
                         $dt->setTime($start->format('G'), $start->format('i'));
                     return $dt;
                 }
@@ -1316,6 +1331,9 @@ class libcalendaring extends rcube_plugin
         $instance_date = !empty($event['recurrence_date']) ? $event['recurrence_date'] : $event['start'];
 
         if ($instance_date instanceof DateTime || $instance_date instanceof DateTimeImmutable) {
+            if ($instaance_date instanceof DateTimeImmutable) {
+                $instance_date = DateTime::createFromImmutable( $instance_date );
+            }
             // According to RFC5545 (3.8.4.4) RECURRENCE-ID format should
             // be date/date-time depending on the main event type, not the exception
             if ($allday === null) {
@@ -1465,7 +1483,10 @@ class libcalendaring extends rcube_plugin
             switch ($k) {
             case 'UNTIL':
                 // convert to UTC according to RFC 5545
-                if (is_a($val, 'DateTime') || is_a($ex, 'DateTimeImmutable')) {
+                if (is_a($val, 'DateTime') || is_a($val, 'DateTimeImmutable')) {
+                    if ($val instanceof DateTimeImmutable) {
+                        $val = DateTime::createFromImmutable( $val );
+                    }
                     if (!$allday && empty($val->_dateonly)) {
                         $until = clone $val;
                         $until->setTimezone(new DateTimeZone('UTC'));
@@ -1480,6 +1501,9 @@ class libcalendaring extends rcube_plugin
             case 'EXDATE':
                 foreach ((array)$val as $i => $ex) {
                     if (is_a($ex, 'DateTime') || is_a($ex, 'DateTimeImmutable')) {
+                        if ($ex instanceof DateTimeImmutable) {
+                            $ex = DateTime::createFromImmutable( $ex );
+                        } 
                         $val[$i] = $ex->format('Ymd\THis');
                     }
                 }

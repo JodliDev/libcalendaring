@@ -713,7 +713,10 @@ class libvcalendar implements Iterator
         }
 
         // assign current timezone to event start/end
-        if (!empty($event['start']) && ($event['start'] instanceof DateTime || $event['start'] instanceof DateTimeImmutable)) {
+	if (!empty($event['start']) && ($event['start'] instanceof DateTime || $event['start'] instanceof DateTimeImmutable)) {
+            if ($event['start'] instanceof DateTimeImmutable) {
+                $event['start'] = DateTime::createFromImmutable( $event['start'] );
+            }
             $this->_apply_timezone($event['start']);
         }
         else {
@@ -721,6 +724,9 @@ class libvcalendar implements Iterator
         }
 
         if (!empty($event['end']) && ($event['end'] instanceof DateTimeImmutable || $event['end'] instanceof DateTimeImmutable)) {
+            if ($event['end'] instanceof DateTimeImmutable) {
+                $event['end'] = DateTime::createFromImmutable( $event['end'] );
+            }
             $this->_apply_timezone($event['end']);
         }
         else {
@@ -904,6 +910,9 @@ class libvcalendar implements Iterator
             }
         }
         else if ($prop instanceof \DateTime || $prop instanceof \DateTimeImmutable) {
+            if ($prop instanceof DateTimeImmutable) {
+                $prop = DateTime::createFromImmutable( $prop );
+            }
             $dt = $prop;
         }
 
@@ -1088,6 +1097,9 @@ class libvcalendar implements Iterator
 
         // we're exporting a recurrence instance only
         if (!$recurrence_id && !empty($event['recurrence_date']) && ($event['recurrence_date'] instanceof DateTime || $event['recurrence_date'] instanceof DateTimeImmutable)) {
+            if ($recurrence_date instanceof DateTimeImmutable) {
+                $recurrence_date = DateTime::createFromImmutable( $recurrence_date );
+            }
             $recurrence_id = $this->datetime_prop($cal, 'RECURRENCE-ID', $event['recurrence_date'], false, !empty($event['allday']));
             if (!empty($event['thisandfuture'])) {
                 $recurrence_id->add('RANGE', 'THISANDFUTURE');
@@ -1130,6 +1142,9 @@ class libvcalendar implements Iterator
             if (is_array($exdates)) {
                 foreach ($exdates as $exdate) {
                     if ($exdate instanceof DateTime || $exdate instanceof DateTimeImmutable) {
+                        if ($exdate instanceof DateTimeImmutable) {
+                            $exdate = DateTime::createFromImmutable( $exdate );
+                        }
                         $ve->add($this->datetime_prop($cal, 'EXDATE', $exdate));
                     }
                 }
@@ -1195,6 +1210,9 @@ class libvcalendar implements Iterator
                 $va = $cal->createComponent('VALARM');
                 $va->action = $alarm['action'];
                 if ($alarm['trigger'] instanceof DateTime || $alarm['trigger'] instanceof DateTimeImmutable) {
+                    if ($alarm['trigger'] instanceof DateTimeImmutable) {
+                        $alarm['trigger'] = DateTime::createFromImmutable( $alarm['trigger'] );
+                    }
                     $va->add($this->datetime_prop($cal, 'TRIGGER', $alarm['trigger'], true, null, true));
                 }
                 else {
@@ -1237,6 +1255,9 @@ class libvcalendar implements Iterator
                 $va->add('TRIGGER', $val[3]);
             }
             else if ($val[0] instanceof DateTime || $val[0] instanceof DateTimeImmutable) {
+                if ($val[0] instanceof DateTimeImmutable) {
+                    $val[0] = DateTime::createFromImmutable( $val[0] );
+                }
                 $va->add($this->datetime_prop($cal, 'TRIGGER', $val[0], true, null, true));
             }
             $ve->add($va);
