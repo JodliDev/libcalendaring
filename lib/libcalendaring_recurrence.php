@@ -128,6 +128,9 @@ class libcalendaring_recurrence
     {
         // recurrence end date is given
         if ($this->recurrence['UNTIL'] instanceof DateTime || $this->recurrence['UNTIL'] instanceof DateTimeImmutable) {
+            if ($this->recurrence['UNTIL'] instanceof DateTimeImmutable) {
+                $this->recurrence['UNTIL'] = DateTime::createFromImmutable( $this->recurrence['UNTIL'] );
+            }
             return $this->recurrence['UNTIL'];
         }
 

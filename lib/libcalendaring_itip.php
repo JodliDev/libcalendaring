@@ -467,6 +467,9 @@ class libcalendaring_itip
                             if ($key == 'allday') {
                                 $event[$key] = $event[$key] == 'true';
                             }
+                            if ($existing[$key] instanceof DateTimeImmutable) {
+                                $existing[$key] = DateTime::createFromImmutable( $existing[$key] );
+                            }
                             $value = ($existing[$key] instanceof DateTime || $existing[$key] instanceof DateTimeImmutable) ? $existing[$key]->format('c') : $existing[$key];
                             $num++;
                             $got += intval($value == $event[$key]);
@@ -683,6 +686,9 @@ class libcalendaring_itip
             // For replies we need more metadata
             foreach (array('start', 'end', 'due', 'allday', 'recurrence', 'location') as $key) {
                 if (isset($event[$key])) {
+                    if ($event[$key] instanceof DateTimeImmutable) {
+                        $event[$key] = DateTime::createFromImmutable( $event[$key] );
+                    }
                     $metadata[$key] = ($event[$key] instanceof DateTime || $event[$key] instanceof DateTimeImmutable) ? $event[$key]->format('c') : $event[$key];
                 }
             }
